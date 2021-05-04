@@ -1,0 +1,6 @@
+alembic
+colorama
+python-dotenv
+PyMySQL
+structlog
+SQLAlchemy

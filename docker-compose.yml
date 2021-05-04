@@ -12,6 +12,10 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
       MYSQL_DATABASE: dlc_oracle_bot
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
     networks:
       - dlc-oracle-bot-network
 
@@ -25,6 +29,25 @@ services:
       - 8082
     environment:
       - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+    networks:
+      - dlc-oracle-bot-network
+
+  database-schema:
+    build: dlc_oracle_bot
+    container_name: database-schema
+    restart: always
+    entrypoint: ["/database_schema.sh"]
+    volumes:
+      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
+    environment:
+      DB_DRIVER: mysql+pymysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: "${MYSQL_USER}"
+      DB_PASSWORD: "${MYSQL_PASSWORD}"
+      DB_DATABASE: dlc_oracle_bot
     depends_on:
       - mariadb
     networks:
