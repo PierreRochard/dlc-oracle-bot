@@ -53,6 +53,27 @@ services:
     networks:
       - dlc-oracle-bot-network
 
+  cryptowatch_rates:
+    build: dlc_oracle_bot
+    container_name: cryptowatch-rates
+    restart: always
+    entrypoint: ["/cryptowatch_rates.sh"]
+    volumes:
+      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
+    environment:
+      DB_DRIVER: mysql+pymysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: "${MYSQL_USER}"
+      DB_PASSWORD: "${MYSQL_PASSWORD}"
+      DB_DATABASE: dlc_oracle_bot
+      CRYPTOWATCH_PUBLIC_KEY: "${CRYPTOWATCH_PUBLIC_KEY}"
+    depends_on:
+      - mariadb
+    networks:
+      - dlc-oracle-bot-network
+
+
 networks:
   dlc-oracle-bot-network:
     driver: bridge

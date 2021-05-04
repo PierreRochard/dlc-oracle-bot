@@ -1,10 +1,8 @@
-from dlc_oracle_bot.models import Sources
-
-
 def main():
     from dlc_oracle_bot.database.migrations import create_or_update_database
     from dlc_oracle_bot.database.session_scope import session_scope
     from dlc_oracle_bot.logging_utility import log
+    from dlc_oracle_bot.models import Sources
 
     create_or_update_database(echo=True)
     with session_scope(echo=True) as session:
