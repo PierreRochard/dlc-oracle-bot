@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    volumes:
+      - ${PWD}/mariadb-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_DATABASE: dlc_oracle_bot
+    networks:
+      - dlc-oracle-bot-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - 8082:80
+    expose:
+      - 8082
+    environment:
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+    networks:
+      - dlc-oracle-bot-network
+
+networks:
+  dlc-oracle-bot-network:
+    driver: bridge
