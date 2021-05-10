@@ -1,6 +1,7 @@
 alembic
 colorama
 cryptowatch-sdk
+marshmallow
 python-dotenv
 PyMySQL
 structlog

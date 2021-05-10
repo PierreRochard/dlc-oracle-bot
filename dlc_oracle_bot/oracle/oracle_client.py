@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 
 from dlc_oracle_bot.logging_utility import log
+from dlc_oracle_bot.oracle.schema_validation import event_schema
 
 
 class OracleClient(object):
@@ -69,7 +70,8 @@ class OracleClient(object):
             ]
         }
         response = self.query_oracle(get_event_data)
-        return response
+        validated_response = event_schema.load(response)
+        return validated_response
 
     def sign_event(self, label: str, value: int):
         sign_data = {
