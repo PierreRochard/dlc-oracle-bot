@@ -73,6 +73,18 @@ services:
     networks:
       - dlc-oracle-bot-network
 
+  oracle-server:
+    image: bitcoinscala/bitcoin-s-oracle-server:latest
+    container_name: oracle-server
+    restart: always
+    volumes:
+      - ${PWD}/oracle-server-data:/home/bitcoin-s/.bitcoin-s
+    ports:
+      - 9998:9998
+    expose:
+      - 9998
+    networks:
+      - dlc-oracle-bot-network
 
 networks:
   dlc-oracle-bot-network:

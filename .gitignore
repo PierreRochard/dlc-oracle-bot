@@ -1,4 +1,5 @@
 .env
 venv
 mariadb-data
+oracle-server-data
 .idea
