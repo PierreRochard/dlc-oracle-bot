@@ -17,6 +17,6 @@ return() {
 
 while true
 do
-  python -u database_schema.py
+  python -u external_rate_services/announcer.py
   sleep 5
 done

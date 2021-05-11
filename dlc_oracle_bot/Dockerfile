@@ -1,10 +1,7 @@
 FROM python:3
 
-COPY ./database_schema.sh /database_schema.sh
-RUN ["chmod", "+x", "/database_schema.sh"]
-
-COPY ./external_rate_services/cryptowatch_rates.sh /cryptowatch_rates.sh
-RUN ["chmod", "+x", "/cryptowatch_rates.sh"]
+COPY ./oracle/announcer.sh /announcer.sh
+RUN ["chmod", "+x", "/announcer.sh"]
 
 ENV PYTHONPATH="${PYTHONPATH}:/usr/src/"
 

@@ -3,13 +3,14 @@ import os
 
 from dotenv import load_dotenv
 
-from dlc_oracle_bot.external_rate_services.cryptowatch_rates import CryptowatchRates
+from dlc_oracle_bot.external_rate_services.cryptowatch_rates import get_close
 from dlc_oracle_bot.oracle.oracle_client import OracleClient
+
+load_dotenv()
 
 
 class Announcer(object):
     def __init__(self):
-        load_dotenv()
         self.oracle_client = OracleClient(host=os.environ['ORACLE_SERVER_HOST'],
                                           port=int(os.environ['ORACLE_SERVER_PORT']))
 
@@ -50,7 +51,7 @@ class Announcer(object):
             announcement = self.oracle_client.get_event(label=label)
 
         if datetime_requested_truncated < datetime.utcnow():
-            close = CryptowatchRates().get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
+            close = get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
             if close is not None:
                 self.oracle_client.sign_event(label=label, value=close)
                 announcement = self.oracle_client.get_event(label=label)
