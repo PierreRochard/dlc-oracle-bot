@@ -11,8 +11,8 @@ from dlc_oracle_bot.database.base import Base
 from dlc_oracle_bot.models.guid import GUID
 
 
-class Assets(Base):
-    __tablename__ = 'assets'
+class Pairs(Base):
+    __tablename__ = 'pairs'
 
     created_at = Column(DateTime(timezone=True),
                         nullable=False,
@@ -33,4 +33,3 @@ class Assets(Base):
     )
     source_id = Column(GUID)
     name = Column(Text)
-    unit_of_account = Column(Text)

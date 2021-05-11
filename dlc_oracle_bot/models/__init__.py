@@ -1,4 +1,3 @@
-from .announcements import Announcements
-from .assets import Assets
-from .prices import Prices
+from .pairs import Pairs
+from .price_announcements import PriceAnnouncements
 from .sources import Sources

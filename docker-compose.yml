@@ -1,78 +1,6 @@
 version: '3'
 
 services:
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    restart: always
-    volumes:
-      - ${PWD}/mariadb-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
-      MYSQL_USER: "${MYSQL_USER}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
-      MYSQL_DATABASE: dlc_oracle_bot
-    ports:
-      - 3306:3306
-    expose:
-      - 3306
-    networks:
-      - dlc-oracle-bot-network
-
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - 8082:80
-    expose:
-      - 8082
-    environment:
-      - PMA_HOST=mariadb
-    depends_on:
-      - mariadb
-    networks:
-      - dlc-oracle-bot-network
-
-  database-schema:
-    build: dlc_oracle_bot
-    container_name: database-schema
-    restart: always
-    entrypoint: ["/database_schema.sh"]
-    volumes:
-      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
-    environment:
-      DB_DRIVER: mysql+pymysql
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DB_USER: "${MYSQL_USER}"
-      DB_PASSWORD: "${MYSQL_PASSWORD}"
-      DB_DATABASE: dlc_oracle_bot
-    depends_on:
-      - mariadb
-    networks:
-      - dlc-oracle-bot-network
-
-  cryptowatch_rates:
-    build: dlc_oracle_bot
-    container_name: cryptowatch-rates
-    restart: always
-    entrypoint: ["/cryptowatch_rates.sh"]
-    volumes:
-      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
-    environment:
-      DB_DRIVER: mysql+pymysql
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DB_USER: "${MYSQL_USER}"
-      DB_PASSWORD: "${MYSQL_PASSWORD}"
-      DB_DATABASE: dlc_oracle_bot
-      CRYPTOWATCH_PUBLIC_KEY: "${CRYPTOWATCH_PUBLIC_KEY}"
-    depends_on:
-      - mariadb
-    networks:
-      - dlc-oracle-bot-network
-
   oracle-server:
     image: bitcoinscala/bitcoin-s-oracle-server:latest
     container_name: oracle-server
@@ -83,6 +11,20 @@ services:
       - 9998:9998
     expose:
       - 9998
+    networks:
+      - dlc-oracle-bot-network
+
+  announcer:
+    build: dlc_oracle_bot
+    container_name: announcer
+    restart: always
+    entrypoint: ["/announcer.sh"]
+    volumes:
+      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
+    environment:
+      CRYPTOWATCH_PUBLIC_KEY: "${CRYPTOWATCH_PUBLIC_KEY}"
+    depends_on:
+      - oracle-server
     networks:
       - dlc-oracle-bot-network
 

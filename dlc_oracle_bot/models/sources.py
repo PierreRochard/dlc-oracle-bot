@@ -31,5 +31,5 @@ class Sources(Base):
         primary_key=True,
         default=uuid.uuid4
     )
-    label = Column(Text)
-    url = Column(Text)
+    exchange = Column(Text)
+    data_provider = Column(Text)

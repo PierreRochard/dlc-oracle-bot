@@ -1,12 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import os
 
 from dotenv import load_dotenv
-from dateutil.relativedelta import relativedelta, TH
 
-from dlc_oracle_bot.external_rate_services.timeframes import timeframes
-
-# Announcer is a service that queries the rates database and creates announcements
+from dlc_oracle_bot.external_rate_services.cryptowatch_rates import CryptowatchRates
 from dlc_oracle_bot.oracle.oracle_client import OracleClient
 
 
@@ -17,46 +14,53 @@ class Announcer(object):
                                           port=int(os.environ['ORACLE_SERVER_PORT']))
 
     @staticmethod
-    def get_label(source: str, venue: str, asset_name: str, unit_of_account: str, close_timestamp: datetime):
-        return f'{source}-{venue}-{asset_name}-{unit_of_account}-{close_timestamp.isoformat()}'
+    def get_label(source: str, exchange: str, pair: str, close_timestamp: datetime):
+        return f'{source}-{exchange}-{pair}-{close_timestamp.isoformat()}'
 
-    def generate_future_announcements(self):
-        source = 'cryptowatch'
-        venue = 'kraken'
-        asset_name = 'BTC'
-        unit_of_account = 'EUR'
+    def request_announcement(self, pair: str, timestamp: float, source: str = 'cryptowatch', exchange: str = 'kraken'):
         minimum = 0
         maximum = 1000000
         precision = 0
 
-        weekly_timeframe = timeframes[0]
-        now = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
-        this_week_close_timestamp = now + relativedelta(weekday=TH)
-        close_timestamps = [this_week_close_timestamp]
-        for week in range(1, 10):
-            weekly_timestamp = this_week_close_timestamp + timedelta(days=weekly_timeframe.days * week)
-            close_timestamps.append(weekly_timestamp)
+        datetime_requested = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        datetime_requested_truncated = datetime_requested.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
 
-        announcements = []
-        for close_timestamp in close_timestamps:
-            label = self.get_label(source=source, venue=venue, asset_name=asset_name, unit_of_account=unit_of_account,
-                                   close_timestamp=close_timestamp)
-            existing_announcement = self.oracle_client.get_event(label=label)
-            if existing_announcement is not None:
-                announcements.append(existing_announcement)
-            else:
-                self.oracle_client.create_event(label=label, maturation=close_timestamp,
-                                                                   minimum=minimum, maximum=maximum,
-                                                                   unit=unit_of_account, precision=precision)
-                new_announcement = self.oracle_client.get_event(label=label)
-                announcements.append(new_announcement)
-        print('here')
+        label = self.get_label(
+            source=source,
+            exchange=exchange,
+            pair=pair,
+            close_timestamp=datetime_requested_truncated
+        )
 
+        announcement = self.oracle_client.get_event(label=label)
+        if announcement is None:
+            self.oracle_client.create_event(
+                label=label,
+                maturation=datetime_requested_truncated,
+                minimum=minimum,
+                maximum=maximum,
+                unit=pair,
+                precision=precision
+            )
+            announcement = self.oracle_client.get_event(label=label)
 
-
-    def sign_past_announcements(self):
-        pass
+        if datetime_requested_truncated < datetime.utcnow():
+            close = CryptowatchRates().get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
+            if close is not None:
+                self.oracle_client.sign_event(label=label, value=close)
+                announcement = self.oracle_client.get_event(label=label)
+        return announcement
 
 
 if __name__ == '__main__':
-    Announcer().generate_future_announcements()
+    today = datetime.utcnow()
+    yesterday = today - timedelta(days=1)
+    tomorrow = today + timedelta(days=1)
+    for day in [yesterday, today, tomorrow]:
+        announced = Announcer().request_announcement('BTCUSD', day.timestamp())
+        print(announced)

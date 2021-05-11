@@ -25,6 +25,7 @@ class OracleClient(object):
             headers=self.headers,
             data=json.dumps(request_data)
         )
+        response.raise_for_status()
         response_data = json.loads(response.text)
         log.debug('query_oracle', response_data=response_data)
         if response_data['error'] is not None:

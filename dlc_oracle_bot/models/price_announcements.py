@@ -5,15 +5,15 @@ from sqlalchemy import (
     DateTime,
     func,
     Numeric,
-    Text
+    Text, JSON
 )
 
 from dlc_oracle_bot.database.base import Base
 from dlc_oracle_bot.models.guid import GUID
 
 
-class Prices(Base):
-    __tablename__ = 'prices'
+class PriceAnnouncements(Base):
+    __tablename__ = 'price_announcements'
 
     created_at = Column(DateTime(timezone=True),
                         nullable=False,
@@ -33,4 +33,15 @@ class Prices(Base):
     asset_id = Column(GUID)
     period = Column(Text)
     close_timestamp = Column(DateTime(timezone=True))
-    rate = Column(Numeric)
+    signed_outcome = Column(Numeric)
+    announcement_tlv = Column(Text)
+    maturation_time_epoch = Column(Numeric)
+    announcement_signature = Column(Text)
+    signing_version = Column(Text)
+    event_tlv = Column(Text)
+    maturation_time = Column(DateTime(timezone=True))
+    nonces = Column(JSON)
+    outcomes = Column(JSON)
+    label = Column(Text)
+    event_descriptor_tlv = Column(Text)
+    attestations = Column(Text)
