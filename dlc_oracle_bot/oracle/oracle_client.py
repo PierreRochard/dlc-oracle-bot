@@ -71,6 +71,8 @@ class OracleClient(object):
             ]
         }
         response = self.query_oracle(get_event_data)
+        if response is None:
+            return None
         validated_response = event_schema.load(response)
         return validated_response
 

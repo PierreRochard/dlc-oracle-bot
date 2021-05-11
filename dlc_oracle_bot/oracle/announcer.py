@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 import os
+from pprint import pformat
 
 from dotenv import load_dotenv
 
@@ -39,7 +40,7 @@ class Announcer(object):
         )
 
         announcement = self.oracle_client.get_event(label=label)
-        if announcement is None:
+        if announcement is None and datetime_requested_truncated > datetime.now(tz=timezone.utc):
             self.oracle_client.create_event(
                 label=label,
                 maturation=datetime_requested_truncated,
@@ -50,7 +51,7 @@ class Announcer(object):
             )
             announcement = self.oracle_client.get_event(label=label)
 
-        if datetime_requested_truncated < datetime.utcnow():
+        if announcement is not None and datetime_requested_truncated < datetime.now(tz=timezone.utc):
             close = get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
             if close is not None:
                 self.oracle_client.sign_event(label=label, value=close)
@@ -62,6 +63,8 @@ if __name__ == '__main__':
     today = datetime.utcnow()
     yesterday = today - timedelta(days=1)
     tomorrow = today + timedelta(days=1)
+    announcements = []
     for day in [yesterday, today, tomorrow]:
         announced = Announcer().request_announcement('BTCUSD', day.timestamp())
-        print(announced)
+        announcements.append(announced)
+    print(pformat(announcements))
