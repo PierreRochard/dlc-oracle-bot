@@ -51,7 +51,8 @@ class Announcer(object):
             )
             announcement = self.oracle_client.get_event(label=label)
 
-        if announcement is not None and datetime_requested_truncated < datetime.now(tz=timezone.utc):
+        if announcement is not None and announcement['signed_outcome'] is None \
+                and datetime_requested_truncated < datetime.now(tz=timezone.utc):
             close = get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
             if close is not None:
                 self.oracle_client.sign_event(label=label, value=close)
