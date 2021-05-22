@@ -2,3 +2,4 @@
 venv
 oracle-server-data
 .idea
+dlc_oracle_bot/oracle/data

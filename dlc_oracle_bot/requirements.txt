@@ -1,5 +1,6 @@
 colorama
 cryptowatch-sdk
 marshmallow
+pillow
 python-dotenv
 structlog

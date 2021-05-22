@@ -5,7 +5,9 @@ from pprint import pformat
 from dotenv import load_dotenv
 
 from dlc_oracle_bot.external_rate_services.cryptowatch_rates import get_close
+from dlc_oracle_bot.oracle.generate_price_image import generate_price_image
 from dlc_oracle_bot.oracle.oracle_client import OracleClient
+from dlc_oracle_bot.oracle.generate_announcement_image import generate_announcement_image
 
 load_dotenv()
 
@@ -62,10 +64,21 @@ class Announcer(object):
 
 if __name__ == '__main__':
     today = datetime.utcnow()
-    yesterday = today - timedelta(days=1)
     tomorrow = today + timedelta(days=1)
+    days = [today, tomorrow]
+    for i in range(1, 10):
+        historical_day = today - timedelta(days=i)
+        days.insert(0, historical_day)
     announcements = []
-    for day in [yesterday, today, tomorrow]:
+    for i, day in enumerate(days):
         announced = Announcer().request_announcement('BTCUSD', day.timestamp())
         announcements.append(announced)
+        if i > 0:
+            previous_day_announcement = announcements[i -1]
+        else:
+            previous_day_announcement = None
+        if announced is not None and previous_day_announcement is not None:
+            generate_price_image(announced, previous_day_announcement)
+        if announced is not None and announced.get('attestations', None) is not None:
+            generate_announcement_image(announced)
     print(pformat(announcements))
