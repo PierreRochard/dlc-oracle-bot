@@ -37,7 +37,7 @@ def generate_price_image(today_price: float, yesterdays_price: float, today_date
         xy=(
             72, 432
         ),
-        text=f'{percent_change:+.2%} 24HR',
+        text=f'{percent_change:+.2%} • 24HR',
         fill=(
             255,
             255,
