@@ -20,11 +20,15 @@ class OracleClient(object):
         }
         request_data.update(query_data)
         log.debug('query_oracle', request_data=request_data)
-        response = requests.post(
-            url=self.url,
-            headers=self.headers,
-            data=json.dumps(request_data)
-        )
+        try:
+            response = requests.post(
+                url=self.url,
+                headers=self.headers,
+                data=json.dumps(request_data)
+            )
+        except ConnectionError:
+            log.error('Unable to connect to the DLC Oracle server, is it up?', exc_info=True)
+            raise Exception('Oracle client error')
         response.raise_for_status()
         response_data = json.loads(response.text)
         log.debug('query_oracle', response_data=response_data)
