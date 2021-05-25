@@ -3,3 +3,4 @@ venv
 oracle-server-data
 .idea
 dlc_oracle_bot/oracle/data
+!dlc_oracle_bot/oracle/data/__init__.py
