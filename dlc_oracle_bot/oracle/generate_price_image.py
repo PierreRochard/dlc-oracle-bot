@@ -23,7 +23,7 @@ def generate_price_image(today_price: float, yesterdays_price: float, today_date
         xy=(
             72, 191
         ),
-        text=f'${yesterdays_price:,}',
+        text=f'${yesterdays_price:,.2f}',
         fill=(
             255,
             255,
