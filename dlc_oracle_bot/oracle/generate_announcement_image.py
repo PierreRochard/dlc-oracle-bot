@@ -4,7 +4,7 @@ from datetime import timezone, datetime
 
 from PIL import Image, ImageFont, ImageDraw
 
-from dlc_oracle_bot.oracle.config import tweet_2_image_file, font_file, monospace_font_file
+from dlc_oracle_bot.oracle.config import tweet_2_image_file, font_file, monospace_font_file, semi_bold_font_file
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -19,13 +19,28 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
     height = round(square_root / 2)
     multiple = width * height
     last_row_diff = multiple - length
+    width = 122
+    subtitle_font = ImageFont.truetype(font=semi_bold_font_file, size=24)
+    image_editable.text(
+        xy=(
+            51, 110
+        ),
+        text='Attestation',
+        fill=(
+            255,
+            255,
+            255,
+            int(255 * 0.7)
+        ),
+        font=subtitle_font
+    )
 
-    attestations_font = ImageFont.truetype(monospace_font_file, 12)
+    attestations_font = ImageFont.truetype(monospace_font_file, 15)
     split_display_attestation = [attestations[i:i + width] for i in range(0, len(attestations), width)]
     display_attestation = '\n'.join(split_display_attestation)
     image_editable.text(
         xy=(
-            490, 110
+            51, 146
         ),
         text=display_attestation,
         fill=(
@@ -39,7 +54,7 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
     price_font = ImageFont.truetype(font_file, 42)
     image_editable.text(
         xy=(
-            50, 212
+            748, 68
         ),
         text=f'${price:,.2f} {pair}',
         fill=(
@@ -49,49 +64,19 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
         ),
         font=price_font
     )
-
-    sub_price_font = ImageFont.truetype(font_file, 24)
+    date_font = ImageFont.truetype(semi_bold_font_file, 22)
     image_editable.text(
         xy=(
-            50, 267
+            748, 38
         ),
-        text=f'Price • {exchange} Spot',
+        text=f'24hr VWAP • {maturation_time.strftime("%B %d, %Y %H:%M UTC")}',
         fill=(
             255,
             255,
             255,
             int(255 * 0.7)
-        ),
-        font=sub_price_font
-    )
-
-    date_font = ImageFont.truetype(font_file, 42)
-    image_editable.text(
-        xy=(
-            50, 366
-        ),
-        text=f'{maturation_time.strftime("%B %d, %Y")}',
-        fill=(
-            255,
-            255,
-            255
         ),
         font=date_font
-    )
-
-    time_font = ImageFont.truetype(font_file, 24)
-    image_editable.text(
-        xy=(
-            50, 421
-        ),
-        text=f'At close {maturation_time.strftime("%H:%M UTC")}',
-        fill=(
-            255,
-            255,
-            255,
-            int(255 * 0.7)
-        ),
-        font=time_font
     )
 
     my_image.save(f'data/announcement-tweet-2-{exchange}-{pair}-{maturation_time.isoformat()}.png')
