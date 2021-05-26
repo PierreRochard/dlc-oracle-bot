@@ -1,6 +1,6 @@
 import logging
 import math
-from datetime import timezone, datetime
+from datetime import datetime
 
 from PIL import Image, ImageFont, ImageDraw
 
@@ -51,23 +51,10 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
         font=attestations_font
     )
 
-    price_font = ImageFont.truetype(font_file, 42)
-    image_editable.text(
-        xy=(
-            748, 68
-        ),
-        text=f'${price:,.2f} {pair}',
-        fill=(
-            255,
-            255,
-            255
-        ),
-        font=price_font
-    )
     date_font = ImageFont.truetype(semi_bold_font_file, 24)
     image_editable.text(
         xy=(
-            748, 38
+            810, 38
         ),
         text=f'{maturation_time.strftime("%B %d, %Y %H:%M UTC")}',
         fill=(
@@ -77,6 +64,20 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
             int(255 * 0.7)
         ),
         font=date_font
+    )
+
+    price_font = ImageFont.truetype(font_file, 42)
+    image_editable.text(
+        xy=(
+            810, 68
+        ),
+        text=f'${price:,.0f} {pair}',
+        fill=(
+            255,
+            255,
+            255
+        ),
+        font=price_font
     )
 
     my_image.save(f'data/announcement-tweet-2-{exchange}-{pair}-{maturation_time.isoformat()}.png')
