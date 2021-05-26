@@ -64,12 +64,12 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
         ),
         font=price_font
     )
-    date_font = ImageFont.truetype(semi_bold_font_file, 22)
+    date_font = ImageFont.truetype(semi_bold_font_file, 24)
     image_editable.text(
         xy=(
             748, 38
         ),
-        text=f'24hr VWAP • {maturation_time.strftime("%B %d, %Y %H:%M UTC")}',
+        text=f'{maturation_time.strftime("%B %d, %Y %H:%M UTC")}',
         fill=(
             255,
             255,

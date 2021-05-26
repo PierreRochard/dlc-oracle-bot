@@ -4,7 +4,7 @@ from pprint import pformat
 
 from dotenv import load_dotenv
 
-from dlc_oracle_bot.external_rate_services.cryptowatch_rates import get_close
+from dlc_oracle_bot.external_rate_services.cryptowatch_rates import get_daily_close
 from dlc_oracle_bot.oracle.generate_price_image import generate_price_image
 from dlc_oracle_bot.oracle.oracle_client import OracleClient
 from dlc_oracle_bot.oracle.generate_announcement_image import generate_announcement_image
@@ -20,6 +20,16 @@ class Announcer(object):
     @staticmethod
     def get_label(source: str, exchange: str, pair: str, close_timestamp: datetime):
         return f'{source}-{exchange}-{pair}-{close_timestamp.isoformat()}'
+
+    @staticmethod
+    def parse_label(label: str):
+        split_label = label.split('-')
+        return {
+            'source': split_label.pop(0),
+            'exchange': split_label.pop(0),
+            'pair': split_label.pop(0),
+            'close_timestamp': '-'.join(split_label)
+        }
 
     def request_announcement(self, pair: str, timestamp: float, source: str = 'cryptowatch', exchange: str = 'kraken'):
         minimum = 0
@@ -55,7 +65,7 @@ class Announcer(object):
 
         if announcement is not None and announcement['signed_outcome'] is None \
                 and datetime_requested_truncated < datetime.now(tz=timezone.utc):
-            close = get_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
+            close = get_daily_close(timestamp=datetime_requested_truncated, exchange=exchange, pair=pair)
             if close is not None:
                 self.oracle_client.sign_event(label=label, value=close)
                 announcement = self.oracle_client.get_event(label=label)
@@ -63,22 +73,36 @@ class Announcer(object):
 
 
 if __name__ == '__main__':
-    today = datetime.utcnow()
+    today = datetime.now(tz=timezone.utc)
     tomorrow = today + timedelta(days=1)
     days = [today, tomorrow]
     for i in range(1, 10):
         historical_day = today - timedelta(days=i)
         days.insert(0, historical_day)
     announcements = []
+    announcer = Announcer()
     for i, day in enumerate(days):
-        announced = Announcer().request_announcement('BTCUSD', day.timestamp())
+        announced = announcer.request_announcement('BTCUSD', day.timestamp())
         announcements.append(announced)
-        if i > 0:
-            previous_day_announcement = announcements[i -1]
-        else:
-            previous_day_announcement = None
-        if announced is not None and previous_day_announcement is not None:
-            generate_price_image(announced, previous_day_announcement)
+        if announced is not None and announced.get('signed_outcome', None) is not None:
+            parsed_label = announcer.parse_label(announced['label'])
+            previous_day = day - timedelta(days=1)
+            previous_day_close = get_daily_close(timestamp=previous_day,
+                                                 exchange=parsed_label['exchange'],
+                                                 pair=parsed_label['pair'])
+            generate_price_image(
+                today_price=announced['signed_outcome'],
+                yesterdays_price=previous_day_close,
+                today_date=announced['maturation_time'],
+                pair=parsed_label['pair']
+            )
         if announced is not None and announced.get('attestations', None) is not None:
-            generate_announcement_image(announced)
+            generate_announcement_image(
+                attestations=announced['attestations'],
+                price=announced['signed_outcome'],
+                pair=announcer.parse_label(announced['label'])['pair'],
+                exchange=announcer.parse_label(announced['label'])['exchange'],
+                maturation_time=announced['maturation_time']
+            )
+
     print(pformat(announcements))
