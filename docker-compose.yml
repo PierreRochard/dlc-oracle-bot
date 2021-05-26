@@ -14,17 +14,29 @@ services:
     networks:
       - dlc-oracle-bot-network
 
-  announcer:
-    build: dlc_oracle_bot
-    container_name: announcer
-    restart: always
-    entrypoint: ["/announcer.sh"]
+#  announcer:
+#    build: dlc_oracle_bot
+#    container_name: announcer
+#    restart: always
+#    entrypoint: ["/announcer.sh"]
+#    volumes:
+#      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
+#    environment:
+#      CRYPTOWATCH_PUBLIC_KEY: "${CRYPTOWATCH_PUBLIC_KEY}"
+#    depends_on:
+#      - oracle-server
+#    networks:
+#      - dlc-oracle-bot-network
+
+  bitcoind-testnet:
+    image: bitcoind
+    container_name: bitcoind-testnet
+    build: bitcoind
+    user: bitcoin
     volumes:
-      - ${PWD}/dlc_oracle_bot:/usr/src/dlc_oracle_bot
-    environment:
-      CRYPTOWATCH_PUBLIC_KEY: "${CRYPTOWATCH_PUBLIC_KEY}"
-    depends_on:
-      - oracle-server
+      - ${PWD}/bitcoind-testnet-data:/home/bitcoin/.bitcoin
+    command:
+      sh -c "cp /home/bitcoin/bitcoin-testnet.conf /home/bitcoin/.bitcoin/bitcoin.conf && bitcoind"
     networks:
       - dlc-oracle-bot-network
 
