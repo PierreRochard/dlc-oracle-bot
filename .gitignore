@@ -1,6 +1,10 @@
 .env
-venv
-oracle-server-data
+
 .idea
+venv
+
+bitcoind-testnet-data
+oracle-server-data
+
 dlc_oracle_bot/oracle/data
 !dlc_oracle_bot/oracle/data/__init__.py
