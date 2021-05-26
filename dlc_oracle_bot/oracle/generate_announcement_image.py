@@ -80,7 +80,7 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
         font=price_font
     )
 
-    my_image.save(f'data/announcement-tweet-2-{exchange}-{pair}-{maturation_time.isoformat()}.png')
+    my_image.save(f'data/images/{maturation_time.isoformat()}-announcement-tweet-2-{exchange}-{pair}.png')
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import logging
 
@@ -56,8 +57,11 @@ def generate_price_image(today_price: float, yesterdays_price: float, today_date
         ),
         font=font
     )
-
-    first_tweet_image.save(f'data/announcement-tweet-1-{pair}-{today_date.isoformat()}.png')
+    data_images_path = os.path.join('data', 'images')
+    if not os.path.exists(data_images_path):
+        os.makedirs(data_images_path)
+    image_path = os.path.join(data_images_path, f'{today_date.isoformat()}-announcement-tweet-1-{pair}.png')
+    first_tweet_image.save(image_path)
 
 
 if __name__ == '__main__':
