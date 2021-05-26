@@ -1,0 +1,6 @@
+tweet_1_image_file = 'data/tweet1.png'
+tweet_2_image_file = 'data/tweet2.png'
+bold_font_file = 'data/IBM_Plex_Sans/IBMPlexSans-Bold.ttf'
+semi_bold_font_file = 'data/IBM_Plex_Sans/IBMPlexSans-SemiBold.ttf'
+font_file = 'data/IBM_Plex_Sans/IBMPlexSans-Medium.ttf'
+monospace_font_file = 'data/IBM_Plex_Mono/IBMPlexMono-Regular.ttf'

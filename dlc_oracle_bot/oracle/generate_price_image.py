@@ -3,16 +3,13 @@ import logging
 
 from PIL import Image, ImageFont, ImageDraw
 
-logging.basicConfig(level=logging.DEBUG)
+from dlc_oracle_bot.oracle.config import tweet_1_image_file, bold_font_file, semi_bold_font_file
 
-tweet_image_file = 'data/tweet1.png'
-bold_font_file = 'data/IBM_Plex_Sans/IBMPlexSans-Bold.ttf'
-semi_bold_font_file = 'data/IBM_Plex_Sans/IBMPlexSans-SemiBold.ttf'
-font_file = 'data/IBM_Plex_Sans/IBMPlexSans-Medium.ttf'
+logging.basicConfig(level=logging.DEBUG)
 
 
 def generate_price_image(today_price: float, yesterdays_price: float, today_date: datetime, pair: str):
-    first_tweet_image = Image.open(tweet_image_file)
+    first_tweet_image = Image.open(tweet_1_image_file)
     image_editable = ImageDraw.Draw(first_tweet_image)
 
     change = today_price - yesterdays_price
@@ -23,7 +20,7 @@ def generate_price_image(today_price: float, yesterdays_price: float, today_date
         xy=(
             72, 191
         ),
-        text=f'${yesterdays_price:,.2f}',
+        text=f'${today_price:,.2f}',
         fill=(
             255,
             255,
