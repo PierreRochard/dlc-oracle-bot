@@ -117,14 +117,14 @@ if __name__ == '__main__':
             signed_outcome=announced['signed_outcome']
         )
 
-        generate_price_image(
+        tweet_1_path = generate_price_image(
             today_price=days_close,
             yesterdays_price=previous_day_close,
             today_date=announced['maturation_time'],
             pair=parsed_label['pair']
         )
 
-        generate_announcement_image(
+        tweet_2_path = generate_announcement_image(
             attestations=announced['attestations'],
             price=announced['signed_outcome'],
             pair=announcer.parse_label(announced['label'])['pair'],

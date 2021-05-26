@@ -62,6 +62,7 @@ def generate_price_image(today_price: float, yesterdays_price: float, today_date
         os.makedirs(data_images_path)
     image_path = os.path.join(data_images_path, f'{today_date.isoformat()}-announcement-tweet-1-{pair}.png')
     first_tweet_image.save(image_path)
+    return image_path
 
 
 if __name__ == '__main__':

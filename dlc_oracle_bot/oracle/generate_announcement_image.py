@@ -1,5 +1,6 @@
 import logging
 import math
+import os
 from datetime import datetime
 
 from PIL import Image, ImageFont, ImageDraw
@@ -10,8 +11,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def generate_announcement_image(attestations: str, price: float, pair: str, exchange: str, maturation_time: datetime):
-    my_image = Image.open(tweet_2_image_file)
-    image_editable = ImageDraw.Draw(my_image)
+    tweet_image = Image.open(tweet_2_image_file)
+    image_editable = ImageDraw.Draw(tweet_image)
 
     length = len(attestations)
     square_root = math.sqrt(length)
@@ -80,7 +81,13 @@ def generate_announcement_image(attestations: str, price: float, pair: str, exch
         font=price_font
     )
 
-    my_image.save(f'data/images/{maturation_time.isoformat()}-announcement-tweet-2-{exchange}-{pair}.png')
+    data_images_path = os.path.join('data', 'images')
+    if not os.path.exists(data_images_path):
+        os.makedirs(data_images_path)
+    image_path = os.path.join(data_images_path,
+                                  f'{maturation_time.isoformat()}-announcement-tweet-2-{exchange}-{pair}.png')
+    tweet_image.save(image_path)
+    return image_path
 
 
 if __name__ == '__main__':
